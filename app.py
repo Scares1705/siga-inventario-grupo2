@@ -3,6 +3,7 @@
 # Aplicación web con Streamlit sobre la base de datos SQLite
 # ============================================================
 import sqlite3
+import threading
 from datetime import date
 
 import pandas as pd
@@ -146,8 +147,15 @@ def crear_base(con):
         con.commit()
 
 
+@st.cache_resource
+def obtener_candado():
+    """Un candado compartido: evita que dos sesiones creen la base a la vez."""
+    return threading.Lock()
+
+
 conexion = conectar()
-crear_base(conexion)
+with obtener_candado():
+    crear_base(conexion)
 cursor = conexion.cursor()
 
 # ------------------------------------------------------------
@@ -408,11 +416,16 @@ def pestana_alertas():
 # ------------------------------------------------------------
 st.title("🔧 Punto Constructor")
 tab1, tab2, tab3, tab4 = st.tabs(["Inicio", "Registrar movimiento", "Inventario", "Alertas"])
+# Cada pestaña usa el candado para que dos sesiones no lean y escriban la base a la vez
 with tab1:
-    pestana_inicio()
+    with obtener_candado():
+        pestana_inicio()
 with tab2:
-    pestana_registrar()
+    with obtener_candado():
+        pestana_registrar()
 with tab3:
-    pestana_inventario()
+    with obtener_candado():
+        pestana_inventario()
 with tab4:
-    pestana_alertas()
+    with obtener_candado():
+        pestana_alertas()
