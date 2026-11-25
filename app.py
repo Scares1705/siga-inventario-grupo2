@@ -316,6 +316,68 @@ def registrar_entradas_lote(items, fecha=None, id_proveedor=None):
 # ------------------------------------------------------------
 # 3. AYUDAS PARA LA INTERFAZ
 # ------------------------------------------------------------
+ESTILO = """
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+.stApp { background: #F5F2EA; font-family: 'Inter', sans-serif; }
+[data-testid="stHeader"] { background: transparent; }
+.block-container { padding-top: 2rem; max-width: 1100px; }
+
+/* Títulos */
+.stApp h1, .stApp h2, .stApp h3 { font-family: 'Space Grotesk', sans-serif; color: #1B5E20; }
+.stApp h2 { font-weight: 700; border-bottom: 3px solid #2E7D32; padding-bottom: 0.4rem; }
+
+/* Encabezado de la app */
+.banner { background: linear-gradient(135deg, #1B5E20, #2E7D32); border-bottom: 6px solid #E8A33D;
+          border-radius: 14px; padding: 28px 34px; margin-bottom: 14px; }
+.banner .kicker { color: #C8E6C9; font-size: 0.8rem; font-weight: 600; letter-spacing: 4px; }
+.banner .titulo { color: #FFFFFF; font-family: 'Space Grotesk', sans-serif; font-size: 2.6rem;
+                  font-weight: 700; line-height: 1.15; margin: 6px 0; }
+.banner .sub { color: #E8F5E9; font-size: 1.05rem; }
+
+/* Pestañas */
+button[data-baseweb="tab"] { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+.stApp button[data-baseweb="tab"] p { color: #5E6B60 !important; font-size: 1.05rem; }
+.stApp button[data-baseweb="tab"][aria-selected="true"] p { color: #1B5E20 !important; }
+[data-baseweb="tab-highlight"] { background-color: #2E7D32 !important; height: 4px !important; }
+[data-baseweb="tab-border"] { background-color: #D6D1C4 !important; }
+
+/* Textos y etiquetas */
+.intro p, [data-testid="stWidgetLabel"] p, [data-testid="stCaptionContainer"] p { color: #1B1B1B !important; }
+.intro { background: #FFFFFF; border-left: 8px solid #2E7D32; border-radius: 12px;
+         padding: 18px 24px; margin-bottom: 18px; }
+
+/* Métricas como tarjetas */
+[data-testid="stMetric"] { background: #FFFFFF; border-left: 8px solid #2E7D32; border-radius: 12px;
+                           padding: 20px 24px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); }
+[data-testid="stMetricLabel"] p { color: #5E6B60 !important; font-weight: 600; }
+[data-testid="stMetricValue"] { color: #1B5E20 !important; font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+
+/* Formulario y campos */
+[data-testid="stForm"] { background: #FFFFFF; border: 1px solid #D6D1C4; border-radius: 14px; padding: 26px; }
+div[data-baseweb="select"] > div, div[data-baseweb="input"], [data-testid="stNumberInput"] input
+    { background-color: #FFFFFF !important; color: #1B1B1B !important; }
+div[data-baseweb="select"] div { color: #1B1B1B; }
+
+/* Botones */
+.stButton button, [data-testid="stFormSubmitButton"] button
+    { background: #2E7D32; border: none; border-radius: 10px; padding: 0.6rem 1.8rem; }
+.stButton button p, [data-testid="stFormSubmitButton"] button p { color: #FFFFFF !important; font-weight: 600; }
+.stButton button:hover, [data-testid="stFormSubmitButton"] button:hover { background: #1B5E20; }
+
+/* Slider */
+[data-testid="stSlider"] [role="slider"] { background-color: #2E7D32 !important; }
+
+/* Pie */
+.pie { text-align: center; color: #5E6B60; font-size: 0.9rem; margin-top: 2rem; }
+"""
+
+
+def aplicar_estilo():
+    """Solo cambia el aspecto de la app: colores, tipografía y tarjetas."""
+    st.markdown(f"<style>{ESTILO}</style>", unsafe_allow_html=True)
+
+
 def leer_terceros(tabla, columna_id):
     """Devuelve un diccionario {nombre: id} de proveedores o clientes."""
     df = pd.read_sql_query(f"SELECT {columna_id}, nombre FROM {tabla} ORDER BY nombre", conexion)
@@ -338,10 +400,11 @@ def mostrar_mensaje_guardado():
 # ------------------------------------------------------------
 def pestana_inicio():
     st.header("SIGA · Sistema de Inventario")
-    st.write(
-        "Sistema de control de inventario de **Punto Constructor**, una ferretería. "
+    st.markdown(
+        '<div class="intro">Sistema de control de inventario de <b>Punto Constructor</b>, una ferretería. '
         "Registra entradas (compras) y salidas (ventas, devoluciones, faltantes y daños), "
-        "calcula el stock actual y avisa cuando un producto se está agotando."
+        "calcula el stock actual y avisa cuando un producto se está agotando.</div>",
+        unsafe_allow_html=True,
     )
     inventario = consultar_inventario()
     bajos = alertas_stock_bajo()
@@ -408,13 +471,19 @@ def pestana_alertas():
     else:
         st.warning(f"{len(bajos)} producto(s) con menos de {minimo} unidades.")
         st.dataframe(bajos, width="stretch", hide_index=True)
-        st.bar_chart(bajos.set_index("nombre")["stock"])
+        st.bar_chart(bajos.set_index("nombre")["stock"], color="#2E7D32")
 
 
 # ------------------------------------------------------------
 # 5. PROGRAMA PRINCIPAL
 # ------------------------------------------------------------
-st.title("🔧 Punto Constructor")
+aplicar_estilo()
+st.markdown(
+    '<div class="banner"><div class="kicker">SIGA · SISTEMA DE INVENTARIO</div>'
+    '<div class="titulo">🔧 Punto Constructor</div>'
+    '<div class="sub">Entradas, salidas, stock actual y alertas de reposición</div></div>',
+    unsafe_allow_html=True,
+)
 tab1, tab2, tab3, tab4 = st.tabs(["Inicio", "Registrar movimiento", "Inventario", "Alertas"])
 # Cada pestaña usa el candado para que dos sesiones no lean y escriban la base a la vez
 with tab1:
@@ -429,3 +498,5 @@ with tab3:
 with tab4:
     with obtener_candado():
         pestana_alertas()
+
+st.markdown('<div class="pie">SIGA · Grupo 2 · Programación 2</div>', unsafe_allow_html=True)
