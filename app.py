@@ -346,6 +346,16 @@ ESTILO = """
 /* Textos y etiquetas */
 .intro, .intro *, [data-testid="stWidgetLabel"] p, [data-testid="stCaptionContainer"] p,
 [data-testid="stAlert"], [data-testid="stAlert"] * { color: #1B1B1B !important; }
+
+/* Mensajes (éxito, error, aviso): fondo claro para que se lean */
+[data-testid="stAlert"] > div, [data-baseweb="notification"]
+    { background-color: #FFF8E1 !important; border: 1px solid #E8A33D; border-radius: 12px; }
+[data-testid="stAlert"]:has([data-testid="stAlertContentError"]) > div
+    { background-color: #FDECEA !important; border-color: #C62828; }
+[data-testid="stAlert"]:has([data-testid="stAlertContentSuccess"]) > div
+    { background-color: #E8F5E9 !important; border-color: #2E7D32; }
+[data-testid="stAlert"]:has([data-testid="stAlertContentInfo"]) > div
+    { background-color: #E3F2FD !important; border-color: #1565C0; }
 .intro { background: #FFFFFF; border-left: 8px solid #2E7D32; border-radius: 12px;
          padding: 18px 24px; margin-bottom: 18px; }
 
@@ -357,9 +367,11 @@ ESTILO = """
 
 /* Formulario y campos */
 [data-testid="stForm"] { background: #FFFFFF; border: 1px solid #D6D1C4; border-radius: 14px; padding: 26px; }
-div[data-baseweb="select"] > div, div[data-baseweb="input"], [data-testid="stNumberInput"] input
+[data-baseweb="select"], [data-baseweb="select"] *, [data-baseweb="input"], [data-baseweb="input"] *,
+[data-baseweb="base-input"], [data-baseweb="base-input"] *, [data-testid="stNumberInput"] input
     { background-color: #FFFFFF !important; color: #1B1B1B !important; }
-div[data-baseweb="select"] div { color: #1B1B1B; }
+[data-baseweb="select"] > div, [data-baseweb="input"] { border: 1px solid #C9C3B3 !important; border-radius: 8px !important; }
+[data-baseweb="select"] svg { fill: #1B5E20 !important; }
 
 /* Botones */
 .stButton button, [data-testid="stFormSubmitButton"] button
